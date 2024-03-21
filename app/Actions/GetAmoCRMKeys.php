@@ -2,27 +2,18 @@
 
 namespace App\Actions;
 
+use Exception;
+
 class GetAmoCRMKeys
 {
     public function handle()
     {
         $subdomain     = 'derendaevkosta45'; // поддомен AmoCRM
-        $client_secret = 'k6K1MZPelPL65jhF8CqkmLPqU0GDuqxRdi6nCAShgm8tZY7eU8MX1rSIRSRUCcB2'; // Секретный ключ
-        $client_id     = '599527ba-d9c3-4704-a8bc-9e2683df3b0b'; // ID интеграции
-        $code          = 'def50200653ed6326be108b9b133b1dcbf15ecbb355b1633b8c96d78de371bf910e2b3b9
-        dbd25b44de0539e31cbaa06aaef5a805d43bcd7341477084482c0a21b296d1a82a1d6d2cf33fa8bb80e930b02c
-        a032ac46497a37b1d8f661e443ec1909079561a5f885447409849c518ee0457461ad63d7c303deeebc03ada03f
-        ecbaae3ce00043c14b0bbd38053b66005e660402b942fcd3f138bde6f1888c8b37dfe021da00b0851be1b45041
-        ea27e96c09785ff859f382bf2489eb4facce07962b5cc41c5e83ea19aac1972c0cb7685bd71481448012648682
-        eada7dfbfb4e22cd2dcbad9c2bfa2335e23868519bca0bfda1163dc8b101d834184d2aa3e4a4bdc63f0a6d8a06
-        a0a75f85e9b97aa6a9ca92e70069cefd5631ac57605348e9efce0cae347891414d624876e40bc3bbd409d0684a
-        4e92a829f6bf5e7426679a363e9071201d7757848d8f25f961455547caa1c5b7a1e8eb5028b89e5a44d7957e94
-        e2d61b1ae231664e451f98109f8beec671b6838249e4d5c8efee15785cd246d88ab1d1572dabd8e2a2c3831a94
-        7eab05362fe46ce544e021028b5e617a33aed94de2780f1fb2f61ab10e990511f2b064a115d0f9c35a2054e1e5
-        7ca63b38ca605eb5fe6a700ffdd31bb264a4891e9f48bd05cc8e9e8c1d374a5ba8179ef324911bf6322c4ba08b
-        71209b789f8d1eb751501d0a7f44792a22ac7adbb51d68b6763fe51b9508f8962ec467e5e8b0ed2aed4f'; // Код авторизации
+        $client_secret = '1OMQwvyjZL6cZ0h5rm61RkDlgCKnVQVoI9ifI9choX56tqprvCcTyfRVfa7hK3d2'; // Секретный ключ
+        $client_id     = 'b87d20e5-57ac-424d-a6a8-6a9d5af6b5c4'; // ID интеграции
+        $code          = 'def50200b83fedef2ef5d797d787f78239f0c12e697c5c48e4ab1ad53764a686fe798d5961522dbfb77a91c0a86f8279c21a2cf9617c34dcbedf1e2fa7b79edae407e7b057cbf38df809fc376037b170e51a51ded30d13b00d6a5ec46cce17d2cc88ea1275a33396ed725b4774bff55eaf166b493d5f5438bd9db1bd4e34636955bd4ee3d8b2746325842575ff52697af39710985030f38680e660829bcab2aec9cabb92432913ef089fe2d809f6f8c5bb8882e178b77646949009eeae2940eb4c9032885b1d9c95f25b8e6dc42de9759448386f351a82156d02d44cc78c05d1cb2110f3fc4c7f5c7a276fcda20212aa3ecaae18f9ccb83d72dcef76f1cbbe38e24c5dacbeb063785cc06ae7af01006b72cf67400429f012a7b1b62eff5c0c97571b7269595ab22fa508d4b91fbce8b6471fd9455e89f8849e2428d6e9517be6821f11b6e21f34022fe84fd33e8d88121367d87d034308c32b5288d02bc9704c01758e59b66f6fd2fbbd6aebfeb62f2ba27e3639d0308eda316dd468c6a431b5e9688ab93d157589108019173cb9df2925c6af4f4788744255cab729b350d5032816acea4c6483410974ca02e4358a163054f0452e4a71de7f8576ddb30ac91fa97b7398ead57da9b94ac1f32d5875fce46f0d5d3c48848583692841f10c948594a41e'; // Код авторизации
         $token_file    = 'tokens.txt';
-        $redirect_uri  = 'https://derfing.ru/';
+        $redirect_uri  = 'https://derfing.ru';
 
         $link = "https://$subdomain.amocrm.ru/oauth2/access_token";
 
@@ -60,8 +51,14 @@ class GetAmoCRMKeys
             503 => 'Service unavailable.'
         ];
 
-        if ($code < 200 || $code > 204) die("Error $code. " . (isset($errors[$code]) ? $errors[$code] : 'Undefined error'));
-
+        try {
+            /** Если код ответа не успешный - возвращаем сообщение об ошибке  */
+            if ($code < 200 || $code > 204) {
+                throw new Exception(isset($errors[$code]) ? $errors[$code] : 'Undefined error', $code);
+            }
+        } catch (\Exception $e) {
+            die('Ошибка: ' . $e->getMessage() . PHP_EOL . 'Код ошибки: ' . $e->getCode());
+        }
 
         $response = json_decode($out, true);
 
@@ -69,8 +66,7 @@ class GetAmoCRMKeys
             "access_token"  => $response['access_token'],
             "refresh_token" => $response['refresh_token'],
             "token_type"    => $response['token_type'],
-            "expires_in"    => $response['expires_in'],
-            "endTokenTime"  => $response['expires_in'] + time(),
+            "expires_in"    => $response['expires_in']
         ];
 
         $arrParamsAmo = json_encode($arrParamsAmo);
