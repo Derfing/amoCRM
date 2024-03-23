@@ -3,6 +3,7 @@
 namespace App\Actions;
 
 use Exception;
+use Illuminate\Support\Facades\Storage;
 
 class GetAmoCRMKeys
 {
@@ -12,7 +13,6 @@ class GetAmoCRMKeys
         $client_secret = '1OMQwvyjZL6cZ0h5rm61RkDlgCKnVQVoI9ifI9choX56tqprvCcTyfRVfa7hK3d2'; // Секретный ключ
         $client_id     = 'b87d20e5-57ac-424d-a6a8-6a9d5af6b5c4'; // ID интеграции
         $code          = 'def50200b83fedef2ef5d797d787f78239f0c12e697c5c48e4ab1ad53764a686fe798d5961522dbfb77a91c0a86f8279c21a2cf9617c34dcbedf1e2fa7b79edae407e7b057cbf38df809fc376037b170e51a51ded30d13b00d6a5ec46cce17d2cc88ea1275a33396ed725b4774bff55eaf166b493d5f5438bd9db1bd4e34636955bd4ee3d8b2746325842575ff52697af39710985030f38680e660829bcab2aec9cabb92432913ef089fe2d809f6f8c5bb8882e178b77646949009eeae2940eb4c9032885b1d9c95f25b8e6dc42de9759448386f351a82156d02d44cc78c05d1cb2110f3fc4c7f5c7a276fcda20212aa3ecaae18f9ccb83d72dcef76f1cbbe38e24c5dacbeb063785cc06ae7af01006b72cf67400429f012a7b1b62eff5c0c97571b7269595ab22fa508d4b91fbce8b6471fd9455e89f8849e2428d6e9517be6821f11b6e21f34022fe84fd33e8d88121367d87d034308c32b5288d02bc9704c01758e59b66f6fd2fbbd6aebfeb62f2ba27e3639d0308eda316dd468c6a431b5e9688ab93d157589108019173cb9df2925c6af4f4788744255cab729b350d5032816acea4c6483410974ca02e4358a163054f0452e4a71de7f8576ddb30ac91fa97b7398ead57da9b94ac1f32d5875fce46f0d5d3c48848583692841f10c948594a41e'; // Код авторизации
-        $token_file    = 'tokens.txt';
         $redirect_uri  = 'https://derfing.ru';
 
         $link = "https://$subdomain.amocrm.ru/oauth2/access_token";
@@ -62,19 +62,15 @@ class GetAmoCRMKeys
 
         $response = json_decode($out, true);
 
-        $arrParamsAmo = [
+        $data = [
             "access_token"  => $response['access_token'],
             "refresh_token" => $response['refresh_token'],
             "token_type"    => $response['token_type'],
             "expires_in"    => $response['expires_in']
         ];
 
-        $arrParamsAmo = json_encode($arrParamsAmo);
+        $jsonData = json_encode($data);
 
-        $f = fopen($token_file, 'w');
-        fwrite($f, $arrParamsAmo);
-        fclose($f);
-
-        print_r($arrParamsAmo);
+        Storage::disk('local')->put('data.json', $jsonData);
     }
 }

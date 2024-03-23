@@ -14,4 +14,14 @@ use App\Http\Controllers\AMOController;
 |
 */
 
-Route::get('/getKeys', [AMOController::class, 'getKeys']);
+Route::view('/createLead', 'transaction_form');
+Route::post('/createLead', [AMOController::class, 'createLead']);
+
+Route::view('/editLead', 'edit_transaction_form');
+Route::post('/editLead', [AMOController::class, 'editLead']);
+
+Route::view('/generateLeadsFile', 'generate_leads_file_form');
+Route::get('/downloadLeadsFile', [AMOController::class, 'downloadLeadsFile']);
+
+Route::view('/importLeadsFile', 'import_leads_file');
+Route::post('/importLeadsFile', [AMOController::class, 'importLeadsFile']);
