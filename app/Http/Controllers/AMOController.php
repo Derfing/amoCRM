@@ -34,4 +34,9 @@ class AMOController extends Controller
         $file = $request->file('json_data');
         $service->importLeadsFile($file->get());
     }
+
+    public function createCall(AmoCRMService $service, Request $request)
+    {
+        $service->createCall();
+    }
 }
